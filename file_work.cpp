@@ -1,245 +1,241 @@
 ﻿#include <iostream>
 #include <string>
-//#icclude <unistd.h>
-#include <memory>
+#include <vector>
 #include <fstream>
-#include <filesystem>//после с++17
-//#include <experimental/filesystem>
 
+// Базовый класс Анализатор
+class Analizator {
 
-//#include <windows.h>
-
-// std::ifstream - чтение файла
-// std::ofstream - запись в файл
-// std::fstream - универсальный класс для работы с файлом
-
-
-
-// ofstream
-int main1() {
-
-    setlocale(LC_ALL, "Russian");
-
-
-    std::string path = "test_ofstream.txt";
-    std::ofstream o;
-    o.open(path);
-    if (o.is_open()) {
-        int i = 6789;
-        o << "Test message! " << i << "\n";
-        o << 555;
-        std::string message{ "\nМое сообщение для записи в файл" };
-       o << message << std::endl;
-       o.close();
-    }
-    else {
-        std::cout << "Error open file " << path;
-    }
-    return 0;
-}
-
-// ifstream
-int main2() {
-    setlocale(LC_ALL, "Russian");
-
-
-    std::string path = "test_ofstream.txt";
-    std::ifstream ifs;
-    ifs.open(path);
-    if (ifs.is_open()) {
-
-        /*
-        // Чтение из файла до окончания файла
-        // читаем посмвольно
-        char c;
-        while (!ifs.eof()){        
-            ifs.get(c);
-            std::cout << c << "  ";
-        }*/
-/*
-    // Чтение из файла пока, функция чтения не вернет false
-    // (поток закончился)
-    // читаем посимвольно
-    char c;
-    while (ifs.get(c)){
-        std::cout << c << "  ";
-    }
-    */
-
-        /*
-    // Читаем с помощью пергруженного оператора >>
-    // Чтение из файла до окончания файла
-    while (!ifs.eof()){
-        std::string message;
-
-        //std::cin >> message;
-
-        ifs >> message;
-
-        std::cout << message << std::endl;
-    }*/
-
-    // Читаем из файла построчно с помощью функции getline
-    // Чтение из файла до окончания файла
-        /*
-    while (!ifs.eof()){
-        std::string message;
-        std::getline (ifs,message);
-        std::cout << message <<"\n";
-    }*/
-
-
-    ifs.close();
-    }
-    else {
-        std::cout << "Error open file " << path;
-    }
-    return 0;
-}
-
-
-int main3() {
-
-    setlocale(LC_ALL, "Russian");
-
-    //Для корректного ввода на русском языке в консоли
-    // SetConsoleCP(1251)
-    // SetConsoleCP(866)
-
-    //std::ios::out запись
-    //std::ios::in  чтение
-    //std::ios::app добавление при записи
-    //std::ios::binary работа с бинарным файлом
-
-    std::fstream ifs ("test.txt", std::ios::out |std::ios::in | std::ios::app);
-    
-    if (ifs.is_open()) {
-        ifs << "My first messagesdgfdfgdgfdfgdgf\n";
-        ifs.close();
-    }
-    else {
-        std::cout << " Error open file" << std::endl;
-    }
-
-    ifs.open("test.txt", std::fstream::in);
-    if (ifs.is_open()) {
-        while (!ifs.eof()) {
-            std::string str;
-            std::getline(ifs, str);
-            std::cout << str << std::endl;
-        }
-        ifs.close();
-    }
-    return 0;
-
-}
-
-// Сохранение экземпляров обьекитов (Point) в файл
-//  Класс Point 
-class Point {
-    int x;
-    int y;
 public:
-    Point(int x = 0, int y = 0) :x{ x }, y{ y } {}
-
-    // Оператор для раблоты с потоком вывода
-    friend std::ostream& operator<< (std::ostream&, const Point&);
-
-    // Оператор для раблоты с потоком ввода
-    friend std::istream& operator>> (std::istream&, Point&);
+    virtual void check(char c) = 0;
 
 };
 
-std::ostream& operator<< (std::ostream& io, const Point& point) {
-    io << point.x << " " << point.y;
-    return io;
-}
+//  Анализатор букв
+class AnalizatorGl : public Analizator {
+public:
 
-std::istream& operator>> (std::istream& io, Point& point) {
-    io >> point.x >> point.y;
-    return io;
-}
-
-
-// Запись в текстовый файл 
-int main5() {
-    setlocale(LC_ALL, "Russian");
-    
-
-    std::string path = "object.txt";
-    Point point{ 10,20 };
-      
-    // Запись в файл
-    std::fstream ifs(path, std::ios::out | std::ios::in | std::ios::app);
-        if (!ifs.is_open()) {
-        std::cout << "Error open file " << path;
-        return 0;
+    void check(char c) override {
+        char val[] = "AaEeYyUuIiOo";
+        for (int i{}; i < sizeof(val); ++i)
+            if (c == val[i]) {
+                std::cout << c << std::endl;
+            }
     }
-    ifs << point << '\n';
-    ifs.close();
+};
 
-    // Чтения из файла
-    ifs.open(path, std::fstream::out | std::fstream::in | std::fstream::app);
-    if (!ifs.is_open()) {
-        std::cout << "Error open file " << path;
-        return 0;
+//  Анализатор цифр
+class AnalizatorDig : public Analizator {
+public:
+
+    void check(char c) override {
+        char val[] = "1234567890";
+        for (int i{}; i < sizeof(val); ++i)
+            if (c == val[i]) {
+                std::cout << c << std::endl;
+            }
     }
-    Point p2;
-    std::cout << p2 << std::endl;    
-    ifs >> p2;
-    ifs.close();
-    std::cout << p2 << std::endl;
+};
 
-    
+
+// Контроллер
+class Controller {
+public:
+
+    std::vector<Analizator*> analizators;
+
+    void run(const char* c, int size) {
+
+        for (int i{}; i < size; ++i)
+            for (auto a : analizators)            
+                a->check(c[i]);
+    }
+};
+
+int main99() {
+
+    Controller  c;
+    c.analizators.push_back(new AnalizatorGl);
+    c.analizators.push_back(new AnalizatorDig);
+    c.run("asdfgh33jkl2", 13);
+
     return 0;
 }
 
-// Запись в бинарный файл
-int main() {
+
+class MyException : public std::exception {
+
+    int type{};
+
+public:
+
+    MyException(int type) : 
+        std::exception("Ошибка нашей функции"), 
+        type{ type }{}
+
+    int getType() const { return type; }
+};
+
+double divs(int a, int b) {
+
+    if (b == 0) {
+        throw std::exception("0");
+        //std::cout << "Деление на 0 невозможно" << std::endl;
+        //return -1;
+    }
+    double res = (double)a / b;
+    if (res > 100)
+        throw std::exception("1");
+     return res;
+}
+
+void func(int v) {
+    if (v == 0)
+        throw MyException (0);
+    if (v == 10)
+        throw MyException (1);
+    if (v == 100)
+        throw MyException(2);
+
+
+}
+
+
+// Исключения
+int main(int argc, char* argv[]) {
     setlocale(LC_ALL, "Russian");
+
+    try {
+        func(100);
+    }
+    catch (int err) {
+        std::cout << "Value = 0" << std::endl;
+    }
+    catch (const char* err) {
+        std::cout << err << std::endl;
+    }
+    catch (MyException& err) {
+        std::cout << err.what() << " " << err.getType()  << std::endl;
+    }
+    catch (std::exception ex) {
+        std::cout << ex.what() << std::endl;
+    }
+    return 0;
+
+
+    try {
+        std::cout << divs(1000, 1) << std::endl;
+    }
+    catch (std::exception ex) {
+        if (ex.what()[0] == '0')
+            std::cout << "Деление на 0 не возможно!" << std::endl;
+        else if (ex.what()[0] == '1')
+            std::cout << "Результат больше 100!" << std::endl;
+    }
     
 
-    std::string path = "object2.txt";
-    Point point{ 10,20 };
-    Point point1{ 40,50 };
-    Point point2{ 60,70 };
+    /*
+    * Обработка исключительной ситуации от файлового потока
+    * 
+    try {
+        std::string path = "test_ofstreamss.txt";
+        std::ifstream ifs;
+        ifs.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+        std::cout << "Попытка открыть файл" << std::endl;
+        ifs.open(path);
+        std::cout << "Файл открыт" << std::endl;
+        ifs.close();
+    }
+    catch (std::fstream::failure ex) {
+        std::cout << ex.what() << std::endl;
+        std::cout << ex.code() << std::endl;
+    }
 
-    // Запись бинарного файла
-    std::fstream ifs(path, std::fstream::out | std::fstream::in | std::fstream::app | std::fstream::binary);
-    if (!ifs.is_open()) {
-        std::cout << "Error open file " << path;
-        return 0;
+    
+    catch (std::exception& ex) {
+        
+        std::cout << ex.what() << std::endl;
     }
-    // Пишем в файл каждую точку  write(указатель на обьект приведенный к char,  размер нашего обьекта  )
-    ifs.write((char*)&point, sizeof(Point));
-    ifs.write((char*)&point1, sizeof(Point));
-    ifs.write((char*)&point2, sizeof(Point));
-    ifs.close();
+    
+    */
 
-    // чтение из файла
-    ifs.open(path, std::fstream::out | std::fstream::in | std::fstream::app);
-    if (!ifs.is_open()) {
-        std::cout << "Error open file " << path;
-        return 0;
+    std::cout << "Afret try" << std::endl;
+
+    return 0;
+
+
+
+
+
+
+    try {
+        std::string path = "test_ofstream.txt";
+        std::ifstream ifs;
+        ifs.exceptions(std::ifstream::badbit | std::ifstream::failbit);
+        std::cout << "Попытка открыть файл" << std::endl;
+        ifs.open(path);
+        std::cout << "Файл открыт" << std::endl;
     }
-    while (true) {
-        Point p;
-        // read указатель на обьект приведенный к char,  размер нашего обьекта 
-        ifs.read((char*)&p, sizeof(Point));
-        if (ifs.eof())
-            break;
-        std::cout << p << std::endl;
+    catch (std::fstream::failure ex) {
+        std::cout << ex.what() << std::endl;
+        std::cout << ex.code() << std::endl;
     }
-    ifs.close();
-    std::cout << std::endl;
-    std::cout << std::endl;
-    std::cout << std::endl;
-    
-    ifs.open(path, std::fstream::out | std::fstream::in | std::fstream::app);
-    ifs.seekg(sizeof(Point));
-    Point p;
-    ifs.read((char*)&p, sizeof(Point));
-    std::cout << p << std::endl;
-    
+    catch (std::exception& ex) {
+        std::cout << ex.what() << std::endl;
+    }
+}
+
+
+
+int value{ 99 };
+namespace Space1{
+    int value(10);
+
+    void print() {
+        std::cout << "Print from Space1" << std::endl;
+    }
+}
+
+namespace Space2 {
+    int value(890);
+    void print() {
+        std::cout << "Print from Space2" << std::endl;
+    }
+}
+
+namespace Space1 {
+    int number(10);
+
+    namespace SubSpace1 {
+        int value = 283;
+        void print() {
+            std::cout << "Print from SubSpace1" << std::endl;
+        }
+                
+    }
+}
+
+namespace {
+
+    int noname = 896;
+}
+
+int main888() {
+
+    int value{ 100 };
+
+    int a = ::value;
+
+    std::cout << ::value << std::endl;
+    std::cout << value << std::endl;
+    std::cout << Space1::value << std::endl;
+    std::cout << Space2::value << std::endl;
+    std::cout << Space1::SubSpace1::value << std::endl;
+
+    Space1::print();
+    Space1::SubSpace1::print();
+    Space2::print();
+
+    std::cout << noname << std::endl;
     return 0;
 }
